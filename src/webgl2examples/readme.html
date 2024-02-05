@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Begin Jekyll SEO tag v2.5.0 -->
+    <title>WebGL 2 Examples | webgl2examples</title>
+    <meta name="generator" content="Jekyll v3.7.4" />
+    <meta property="og:title" content="WebGL 2 Examples" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Rendering algorithms implemented in raw WebGL 2." />
+    <meta property="og:description" content="Rendering algorithms implemented in raw WebGL 2." />
+    <link rel="canonical" href="./" />
+    <meta property="og:url" content="./" />
+    <meta property="og:site_name" content="webgl2examples" />
+    <script type="application/ld+json">
+{"headline":"WebGL 2 Examples","@type":"WebSite","url":"./","name":"webgl2examples","description":"Rendering algorithms implemented in raw WebGL 2.","@context":"http://schema.org"}</script>
+    <!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/webgl2examples/assets/css/style.css?v=da1153a15ebc09bb13498e5f732ef2036507740c">
+</head>
+
+<body>
+    <div class="container-lg px-3 my-5 markdown-body">
+
+        <h1><a href="./">webgl2examples</a></h1>
+
+
+        <h1 id="webgl-2-examples">WebGL 2 Examples</h1>
+
+        <p>Rendering algorithms implemented in raw WebGL 2.</p>
+
+        <p>Currently include:</p>
+        <ul>
+            <li><a href="./triangle.html">Just a Triangle</a> (vertex arrays)</li>
+            <li><a href="./cube.html">Phong-shaded Cube</a> (vertex arrays, uniform buffers, immutable textures)</li>
+            <li><a href="./particles.html">Particles</a> (vertex arrays, uniform buffers, transform feedback)</li>
+            <li><a href="./deferred.html">Deferred Rendering</a>(更改为屏幕范围的两个三角形为最后的plane，取消sphere，同步修改GLSL) (vertex arrays, uniform buffers, immutable textures,
+                multiple render targets, float textures, texelFetch, EXT_color_buffer_float)</li>
+            <li><a href="./deferred_lastOne.html">Deferred Rendering 一个最后的screen(-1,-1,1,1,)和一个shader多个光源</a></li>
+            <li><a href="./dof.html">Depth of Field</a> (vertex arrays, uniform buffers, immutable textures, depth
+                textures, texelFetch, hardware instancing)</li>
+            <li><a href="./oit.html">Weighted, Blended Order-independent Transparency</a> (vertex arrays, uniform
+                buffers, immutable textures, multiple render targets, float textures, texelFetch, hardware instancing,
+                EXT_color_buffer_float)</li>
+            <li><a href="./oit-dual-depth-peeling.html">Order-independent Transparency using Dual Depth Peeling</a>
+                (vertex arrays, uniform buffers, immutable textures, multiple render targets, float textures,
+                texelFetch, hardware instancing, EXT_color_buffer_float)</li>
+            <li><a href="./ssao.html">Screen Space Ambient Occlusion</a> (vertex arrays, uniform buffers, immutable
+                textures, multiple render targets, float textures, texelFetch, hardware instancing,
+                EXT_color_buffer_float)</li>
+            <li><a href="./occlusion.html">Occlusion Culling</a> (vertex arrays, uniform buffers, immutable textures,
+                occlusion query)</li>
+        </ul>
+
+        <p>All examples are implemented in a single HTML file with minimal use of functions, modules, classes or other
+            abstractions. The goal is to allow the reader to easily see, in sequential order, all GL calls that are
+            made.</p>
+
+        <p>These examples can be thought of as companion to Shrek Shao and Trung Le’s excellent <a
+                href="http://webglsamples.org/WebGL2Samples/">WebGL 2 Samples Pack</a>. While their samples demonstrate
+            individual features of WebGL 2, this project aims to demonstrate how those features can be used to implement
+            commonly-used algorithms.</p>
+
+        <h2 id="contributing">Contributing</h2>
+
+        <p>Contributions are welcome! Especially new examples that show features that aren’t included in the current
+            set. The only requirement is that new examples use a similar basic structure:</p>
+        <ul>
+            <li>All GL calls are made at the top level (without being split up into “helper functions”). A reader should
+                be able to read through the source HTML and see all GL calls that are made, in the order that they made.
+            </li>
+            <li>Shader code should be included at the top of the HTML file in script elements.</li>
+            <li>Small utility functions are fine (but shouldn’t contain any GL calls!) and should go in <a
+                    href="https://github.com/tsherif/webgl2examples/blob/master/utils/utils.js">utils/utils.js</a>.</li>
+            <li>Use <a href="https://github.com/tsherif/webgl2examples/blob/master/utils/gl-matrix.js">glMatrix</a> for
+                the math.</li>
+        </ul>
+
+
+
+        <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
+            This site is open source. <a href="https://github.com/tsherif/webgl2examples/edit/master/README.md">Improve
+                this page</a>.
+        </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js"
+        integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+
+</body>
+
+</html>
