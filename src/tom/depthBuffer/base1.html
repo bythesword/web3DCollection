@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="canvas"></canvas>
+    <script id="shader-vs" type="vertex">
+        #version 300 es   
+
+        //两种方式都可以,这和属性有关，缺失从0开始
+        in vec3 v3Position;
+        in vec3 a_color;
+        
+        //都可以，有没有bindAttribLocation都可以        
+        //layout (location=0) in vec3 v3Position;
+        //layout (location=1) in vec3 a_color;
+
+
+        out vec3 color;
+        void  main() {
+                color=a_color;
+                gl_Position = vec4(v3Position, 1.0);
+            }
+        </script>
+    <script id="shader-fs" type="fragment">
+        #version 300 es
+        precision highp float;
+        in vec3 color;
+        out vec4 fragColor;
+            void main() {
+                fragColor = vec4(color, 1.0);
+            }
+        </script>
+    <script>
+        function init() {
+            var screenPlane = true;
+            var canvas = document.getElementById("canvas");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            var gl = canvas.getContext("webgl2");
+            if (!gl) {
+                console.error("WebGL 2 not available");
+                document.body.innerHTML = "This example requires WebGL 2 which is unavailable on this system."
+            }
+
+            //用来设置视口
+            gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            return gl;
+        }
+
+        const vs = `#version 300 es
+
+in vec4 a_position;
+in vec4 a_color;
+
+uniform mat4 u_matrix;
+
+out vec4 v_color;
+
+void main() {
+  // Multiply the position by the matrix.
+  gl_Position = u_matrix * a_position;
+
+  // Pass the color to the fragment shader.
+  v_color = a_color;
+}
+`;
+
+        const fs = `#version 300 es
+precision highp float;
+in vec4 v_color;
+in int v_id;
+uniform vec4 u_colorMult;
+out vec4 outColor;
+
+void main() {
+   outColor = v_color /float(v_id);
+}
+`;
+
+        const pickingVS = `#version 300 es
+  in vec4 a_position;  
+  uniform mat4 u_matrix;
+
+  void main() {
+    gl_Position =  a_position;
+  }
+`;
+
+        const pickingFS = `#version 300 es
+  precision highp float;  
+  uniform vec4 u_id;
+  out vec4 outColor;
+  
+  void main() {
+     outColor = u_id;
+  }
+`;
+        function shader(vs, fs) {
+
+
+            //创建shader 正常颜色
+            var vertexShaderObject = gl.createShader(gl.VERTEX_SHADER);
+            var fragmentShaderObject = gl.createShader(gl.FRAGMENT_SHADER);
+            //指定shader数据
+
+            gl.shaderSource(vertexShaderObject, vs);
+            gl.shaderSource(fragmentShaderObject, fs);
+            //编译shader
+            gl.compileShader(vertexShaderObject);
+            gl.compileShader(fragmentShaderObject);
+
+            if (!gl.getShaderParameter(vertexShaderObject, gl.COMPILE_STATUS)) {
+                new Error("error: vertexShaderObject");
+            }
+
+            if (!gl.getShaderParameter(fragmentShaderObject, gl.COMPILE_STATUS)) {
+                new Error("error: fragmentShaderObject");
+            }
+            //创建program
+            var programObject = gl.createProgram();
+            //连接shader
+            gl.attachShader(programObject, vertexShaderObject);
+            gl.attachShader(programObject, fragmentShaderObject);
+
+
+            gl.linkProgram(programObject);
+
+            if (!gl.getProgramParameter(programObject, gl.LINK_STATUS)) {
+                new Error("error: programObject");
+            }
+            gl.useProgram(programObject);
+            return programObject;
+        }
+
+
+        var jsArrayData = [
+            -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
+            0.5, -0.5, -0.0, 1.0, 0.0, 0.0,
+
+            -0.5, 0.5, 0.0, 1.0, 0.0, 0.0,
+            0.5, 0.5, 0.0, 1.0, 0.0, 0.0,
+
+            0.0, -0.35, 0.50, 0.0, 0.0, 1.0,
+            0.75, -0.35, 0.50, 0.0, 0.0, 1.0,
+
+            0.0, 0.35, 0.50, 0.0, 0.0, 1.0,
+            0.75, 0.35, 0.0, 0.0, 0.0, 1.0,
+
+            1, 1, 1,
+            2, 2, 2,
+            3, 3, 3,
+            4, 4, 4,
+        ];
+        //索引坐标
+        var indexDatas = [
+            4, 5, 6,
+            5, 7, 6,
+            
+            0, 1, 2,
+            1, 3, 2,
+
+
+        ];
+
+        //id 
+        var ids = [
+            1, 1, 1,
+            2, 2, 2,
+            3, 3, 3,
+            4, 4, 4
+        ];
+        var gl = init();
+        gl.enable(gl.DEPTH_TEST);
+        var vs1 = document.getElementById("shader-vs").text.trim();
+        var fs1 = document.getElementById("shader-fs").text.trim();
+        var programObject = shader(vs1, fs1);
+
+        //position
+        //创建缓冲区对象
+        var traingleBuffer = gl.createBuffer();
+        //绑定缓冲区对象
+        gl.bindBuffer(gl.ARRAY_BUFFER, traingleBuffer);
+        //顶点数组data数据传入缓冲区
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(jsArrayData), gl.STATIC_DRAW);
+
+        gl.enableVertexAttribArray(0);
+
+        //缓冲区中的数据按照一定的规律传递给位置变量apos
+        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 4 * 6, 0);
+
+
+        //color
+        //创建缓冲区对象
+        var traingleBufferColor = gl.createBuffer();
+        //绑定缓冲区对象
+        gl.bindBuffer(gl.ARRAY_BUFFER, traingleBufferColor);
+        //顶点数组data数据传入缓冲区
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(jsArrayData), gl.STATIC_DRAW);
+
+        gl.enableVertexAttribArray(1);
+        //缓冲区中的数据按照一定的规律传递给位置变量apos
+        gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
+
+        // //id's
+        // //创建缓冲区对象
+        // var traingleBufferID = gl.createBuffer();
+        // //绑定缓冲区对象
+        // gl.bindBuffer(gl.ARRAY_BUFFER, traingleBufferID);
+        // //顶点数组data数据传入缓冲区
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(ids), gl.STATIC_DRAW);
+
+        // gl.enableVertexAttribArray(2);
+        // //缓冲区中的数据按照一定的规律传递给位置变量apos
+        // gl.vertexAttribPointer(1, 1, gl.FLOAT, false, 0, 0);
+
+
+        //创建索引缓冲区
+        var indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexDatas), gl.STATIC_DRAW);
+
+        gl.enable(gl.CULL_FACE);
+      gl.enable(gl.DEPTH_TEST);
+
+        gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0)
+    </script>
+</body>
+
+</html>

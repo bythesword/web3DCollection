@@ -226,7 +226,7 @@
       };
 
     },
-    createScreen: function createBox() {
+    createScreen: function () {
 
 
       var positions = new Float32Array([
